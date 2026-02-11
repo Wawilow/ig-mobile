@@ -3,7 +3,7 @@ from json.decoder import JSONDecodeError
 from pathlib import Path
 from typing import Dict
 
-import requests
+import pycurl_requests as requests
 
 from instagrapi.exceptions import ClientError, ClientLoginRequired
 from instagrapi.extractors import extract_account, extract_user_short
@@ -106,15 +106,14 @@ class AccountMixin:
 
     def remove_bio_links(self, link_ids: list[int]) -> dict:
         signed_body = {
-            "signed_body": "SIGNATURE." + json.dumps(
-                {
-                    "_uid": self.user_id,
-                    "_uuid": self.uuid,
-                    "link_ids": link_ids
-                }
+            "signed_body": "SIGNATURE."
+            + json.dumps(
+                {"_uid": self.user_id, "_uuid": self.uuid, "link_ids": link_ids}
             )
         }
-        return self.private_request('accounts/remove_bio_links/', data=signed_body, with_signature=False)
+        return self.private_request(
+            "accounts/remove_bio_links/", data=signed_body, with_signature=False
+        )
 
     def set_external_url(self, external_url) -> dict:
         """

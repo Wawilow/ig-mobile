@@ -7,9 +7,9 @@ try:
 except ImportError:
     from json.decoder import JSONDecodeError
 
-import requests
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+import pycurl_requests as requests
+# from requests.adapters import HTTPAdapter
+# from requests.packages.urllib3.util.retry import Retry
 
 from instagrapi.exceptions import (
     ClientBadRequestError,
@@ -40,23 +40,23 @@ class PublicRequestMixin:
     def __init__(self, *args, **kwargs):
         # setup request session with retries
         session = requests.Session()
-        try:
-            retry_strategy = Retry(
-                total=3,
-                status_forcelist=[429, 500, 502, 503, 504],
-                allowed_methods=["GET", "POST"],
-                backoff_factor=2,
-            )
-        except TypeError:
-            retry_strategy = Retry(
-                total=3,
-                status_forcelist=[429, 500, 502, 503, 504],
-                method_whitelist=["GET", "POST"],
-                backoff_factor=2,
-            )
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        session.mount("https://", adapter)
-        session.mount("http://", adapter)
+        # try:
+        #     retry_strategy = Retry(
+        #         total=3,
+        #         status_forcelist=[429, 500, 502, 503, 504],
+        #         allowed_methods=["GET", "POST"],
+        #         backoff_factor=2,
+        #     )
+        # except TypeError:
+        #     retry_strategy = Retry(
+        #         total=3,
+        #         status_forcelist=[429, 500, 502, 503, 504],
+        #         method_whitelist=["GET", "POST"],
+        #         backoff_factor=2,
+        #     )
+        # adapter = HTTPAdapter(max_retries=retry_strategy)
+        # session.mount("https://", adapter)
+        # session.mount("http://", adapter)
         self.public = session
         self.public.verify = False  # fix SSLError/HTTPSConnectionPool
         self.public.headers.update(
@@ -97,7 +97,9 @@ class PublicRequestMixin:
             try:
                 if self.delay_range:
                     random_delay(delay_range=self.delay_range)
-                return self._send_public_request(url, update_headers=update_headers, **kwargs)
+                return self._send_public_request(
+                    url, update_headers=update_headers, **kwargs
+                )
             except (
                 ClientLoginRequired,
                 ClientNotFoundError,
@@ -124,13 +126,21 @@ class PublicRequestMixin:
                 continue
 
     def _send_public_request(
-        self, url, data=None, params=None, headers=None, return_json=False, stream=None, timeout=None, update_headers=None
+        self,
+        url,
+        data=None,
+        params=None,
+        headers=None,
+        return_json=False,
+        stream=None,
+        timeout=None,
+        update_headers=None,
     ):
         self.public_requests_count += 1
         if headers:
-            if update_headers in [None, True] :
+            if update_headers in [None, True]:
                 self.public.headers.update(headers)
-            elif update_headers == False :
+            elif update_headers == False:
                 pass
         if self.last_response_ts and (time.time() - self.last_response_ts) < 1.0:
             time.sleep(1.0)
@@ -232,8 +242,10 @@ class PublicRequestMixin:
 
     def public_a1_request_user_info_by_username(self, username, data=None, params=None):
         params = params or {}
-        url = self.PUBLIC_API_URL + f"api/v1/users/web_profile_info/?username={username}"
-        headers = {'x-ig-app-id': '936619743392459'}
+        url = (
+            self.PUBLIC_API_URL + f"api/v1/users/web_profile_info/?username={username}"
+        )
+        headers = {"x-ig-app-id": "936619743392459"}
         response = self.public_request(
             url, data=data, params=params, headers=headers, return_json=True
         )

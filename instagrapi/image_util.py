@@ -14,7 +14,7 @@ try:
 except ImportError:
     raise Exception("You don't have PIL installed. Please install PIL or Pillow>=8.1.1")
 
-import requests
+import pycurl_requests as requests
 
 
 def calc_resize(max_size, curr_size, min_size=(0, 0)):
@@ -112,7 +112,7 @@ def prepare_image(
     max_size=(1080, 1350),
     aspect_ratios=(4.0 / 5.0, 90.0 / 47.0),
     save_path=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Prepares an image file for posting.
@@ -164,7 +164,7 @@ def prepare_video(
     max_duration=60.0,
     save_path=None,
     skip_reencoding=False,
-    **kwargs
+    **kwargs,
 ):
     """
     Prepares a video file for posting.

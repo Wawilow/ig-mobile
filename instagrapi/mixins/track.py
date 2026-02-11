@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Dict
 from urllib.parse import urlparse
 
-import requests
+import pycurl_requests as requests
 
 from instagrapi.exceptions import ClientError, TrackNotFound
 from instagrapi.extractors import extract_track

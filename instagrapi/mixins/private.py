@@ -4,9 +4,9 @@ import random
 import time
 from json.decoder import JSONDecodeError
 
-import requests
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+import pycurl_requests as requests
+# from requests.adapters import HTTPAdapter
+# from requests.packages.urllib3.util.retry import Retry
 
 from instagrapi import config
 from instagrapi.exceptions import (
@@ -87,23 +87,24 @@ class PrivateRequestMixin:
     def __init__(self, *args, **kwargs):
         # setup request session with retries
         session = requests.Session()
-        try:
-            retry_strategy = Retry(
-                total=3,
-                status_forcelist=[429, 500, 502, 503, 504],
-                allowed_methods=["GET", "POST"],
-                backoff_factor=2,
-            )
-        except TypeError:
-            retry_strategy = Retry(
-                total=3,
-                status_forcelist=[429, 500, 502, 503, 504],
-                method_whitelist=["GET", "POST"],
-                backoff_factor=2,
-            )
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        session.mount("https://", adapter)
-        session.mount("http://", adapter)
+        # TODO: add support to retries
+        # try:
+        #     retry_strategy = Retry(
+        #         total=3,
+        #         status_forcelist=[429, 500, 502, 503, 504],
+        #         allowed_methods=["GET", "POST"],
+        #         backoff_factor=2,
+        #     )
+        # except TypeError:
+        #     retry_strategy = Retry(
+        #         total=3,
+        #         status_forcelist=[429, 500, 502, 503, 504],
+        #         method_whitelist=["GET", "POST"],
+        #         backoff_factor=2,
+        #     )
+        # adapter = HTTPAdapter(max_retries=retry_strategy)
+        # session.mount("https://", adapter)
+        # session.mount("http://", adapter)
         self.private = session
         self.private.verify = False  # fix SSLError/HTTPSConnectionPool
         self.email = kwargs.pop("email", None)
@@ -329,9 +330,9 @@ class PrivateRequestMixin:
             if data:  # POST
                 # Client.direct_answer raw dict
                 # data = json.dumps(data)
-                self.private.headers[
-                    "Content-Type"
-                ] = "application/x-www-form-urlencoded; charset=UTF-8"
+                self.private.headers["Content-Type"] = (
+                    "application/x-www-form-urlencoded; charset=UTF-8"
+                )
                 if with_signature:
                     # Client.direct_answer doesn't need a signature
                     data = generate_signature(dumps(data))

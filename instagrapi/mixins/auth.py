@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import Dict, Union
 from uuid import uuid4
 
-import requests
+import pycurl_requests as requests
+from requests.utils import cookiejar_from_dict
 from pydantic import ValidationError
 
 from instagrapi import config
@@ -82,7 +83,7 @@ class PreLoginFlowMixin:
         data = {
             "android_device_id": self.android_device_id,
             "client_contact_points": '[{"type":"omnistring","value":"%s","source":"last_login_attempt"}]'
-                                     % self.username,
+            % self.username,
             "phone_id": self.phone_id,
             "usages": '["account_recovery_omnibox"]',
             "logged_in_user_ids": "[]",  # "[\"123456789\",\"987654321\"]",
@@ -188,7 +189,7 @@ class PostLoginFlowMixin:
         return all(check_flow)
 
     def get_timeline_feed(
-            self, reason: TIMELINE_FEED_REASON = "pull_to_refresh", max_id: str = None
+        self, reason: TIMELINE_FEED_REASON = "pull_to_refresh", max_id: str = None
     ) -> Dict:
         """
         Get your timeline feed
@@ -246,7 +247,7 @@ class PostLoginFlowMixin:
         )
 
     def get_reels_tray_feed(
-            self, reason: REELS_TRAY_REASON = "pull_to_refresh"
+        self, reason: REELS_TRAY_REASON = "pull_to_refresh"
     ) -> Dict:
         """
         Get your reels tray feed
@@ -305,7 +306,9 @@ class LoginMixin(PreLoginFlowMixin, PostLoginFlowMixin):
     ig_www_claim = ""  # e.g. hmac.AR2uidim8es5kYgDiNxY0UG_ZhffFFSt8TGCV5eA1VYYsMNx
 
     def __init__(self):
-        self.bloks_versioning_id = "ce555e5500576acd8e84a66018f54a05720f2dce29f0bb5a1f97f0c10d6fac48"
+        self.bloks_versioning_id = (
+            "ce555e5500576acd8e84a66018f54a05720f2dce29f0bb5a1f97f0c10d6fac48"
+        )
         self.user_agent = None
         self.settings = None
         self.override_app_version = False
@@ -320,9 +323,7 @@ class LoginMixin(PreLoginFlowMixin, PostLoginFlowMixin):
             A boolean value
         """
         if "cookies" in self.settings:
-            self.private.cookies = requests.utils.cookiejar_from_dict(
-                self.settings["cookies"]
-            )
+            self.private.cookies = cookiejar_from_dict(self.settings["cookies"])
         self.authorization_data = self.settings.get("authorization_data", {})
         self.last_login = self.settings.get("last_login")
         self.set_timezone_offset(
@@ -375,11 +376,11 @@ class LoginMixin(PreLoginFlowMixin, PostLoginFlowMixin):
         return True
 
     def login(
-            self,
-            username: Union[str, None] = None,
-            password: Union[str, None] = None,
-            relogin: bool = False,
-            verification_code: str = "",
+        self,
+        username: Union[str, None] = None,
+        password: Union[str, None] = None,
+        relogin: bool = False,
+        verification_code: str = "",
     ) -> bool:
         """
         Login
@@ -427,9 +428,8 @@ class LoginMixin(PreLoginFlowMixin, PostLoginFlowMixin):
         enc_password = self.password_encrypt(self.password)
         data = {
             "jazoest": generate_jazoest(self.phone_id),
-            "country_codes": '[{"country_code":"%d","source":["default"]}]' % int(
-                self.country_code
-            ),
+            "country_codes": '[{"country_code":"%d","source":["default"]}]'
+            % int(self.country_code),
             "phone_id": self.phone_id,
             "enc_password": enc_password,
             "username": username,
@@ -579,7 +579,7 @@ class LoginMixin(PreLoginFlowMixin, PostLoginFlowMixin):
             "ig_u_rur": self.ig_u_rur,
             "ig_www_claim": self.ig_www_claim,
             "authorization_data": self.authorization_data,
-            "cookies": requests.utils.dict_from_cookiejar(self.private.cookies),
+            "cookies": dict_from_cookiejar(self.private.cookies),
             "last_login": self.last_login,
             "device_settings": self.device_settings,
             "user_agent": self.user_agent,
@@ -601,7 +601,9 @@ class LoginMixin(PreLoginFlowMixin, PostLoginFlowMixin):
         self.init()
         return True
 
-    def load_settings(self, path: Union[str, Path], override_app_version: bool = False) -> Dict:
+    def load_settings(
+        self, path: Union[str, Path], override_app_version: bool = False
+    ) -> Dict:
         """
         Load session settings
 

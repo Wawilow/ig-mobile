@@ -5,7 +5,7 @@ import time
 from enum import Enum
 from typing import Dict
 
-import requests
+import pycurl_requests as requests
 
 from instagrapi.exceptions import (
     ChallengeError,
@@ -220,9 +220,9 @@ class ChallengeResolveMixin:
                 details.append(val)
         # CHECK ACCOUNT DATA
         for detail in [self.username, self.email, self.phone_number]:
-            assert (
-                not detail or detail in details
-            ), 'ChallengeResolve: Data invalid: "%s" not in %s' % (detail, details)
+            assert not detail or detail in details, (
+                'ChallengeResolve: Data invalid: "%s" not in %s' % (detail, details)
+            )
         time.sleep(WAIT_SECONDS)
         result = session.post(
             "https://i.instagram.com%s" % result.get("navigation").get("forward"),
@@ -509,9 +509,9 @@ class ChallengeResolveMixin:
                 return True
 
             # last form to verify account details
-            assert (
-                self.last_json["step_name"] == "review_contact_point_change"
-            ), f"Unexpected step_name {self.last_json['step_name']}"
+            assert self.last_json["step_name"] == "review_contact_point_change", (
+                f"Unexpected step_name {self.last_json['step_name']}"
+            )
 
             # details = self.last_json["step_data"]
 

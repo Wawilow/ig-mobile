@@ -7,7 +7,7 @@ from typing import Dict, List
 from urllib.parse import urlparse
 from uuid import uuid4
 
-import requests
+import pycurl_requests as requests
 
 from instagrapi import config
 from instagrapi.exceptions import (
@@ -695,11 +695,7 @@ class UploadPhotoMixin:
                         "color": poll.color,
                         "question": poll.question,
                         "tallies": [
-                            {
-                                "count": 0,
-                                "font_size": 39.0,
-                                "text": o
-                            }
+                            {"count": 0, "font_size": 39.0, "text": o}
                             for o in poll.options
                         ],
                         **poll_extra,
