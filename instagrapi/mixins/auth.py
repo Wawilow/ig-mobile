@@ -11,7 +11,7 @@ from typing import Dict, Union
 from uuid import uuid4
 
 import pycurl_requests as requests
-from requests.utils import cookiejar_from_dict
+from requests.utils import cookiejar_from_dict, dict_from_cookiejar
 from pydantic import ValidationError
 
 from instagrapi import config
