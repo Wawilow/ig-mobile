@@ -68,7 +68,7 @@ keywords = [
     "instagram-note",
 ]
 dependencies = [
-    "requests==2.32.5",
+    "pycurl-requests @ git+https://github.com/Wawilow/pycurl-requests.git@master",
     "PySocks==1.7.1",
     "pydantic==2.12.4",
     "moviepy==1.0.3",
