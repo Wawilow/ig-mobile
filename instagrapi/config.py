@@ -17,9 +17,9 @@ DEVICE_SETTINGS = {
     "android_release": "8.0.0",
     "dpi": "480dpi",
     "resolution": "1080x1920",
-    "manufacturer": "OnePlus",
-    "device": "devitron",
-    "model": "6T Dev",
+    "manufacturer": "Google",
+    "device": "Pixel",
+    "model": "Pixel 4",
     "cpu": "qcom",
 }
 APP_SETTINGS = {
