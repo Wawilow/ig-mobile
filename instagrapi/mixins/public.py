@@ -168,7 +168,7 @@ class PublicRequestMixin:
                 return response
 
             expected_length = int(response.headers.get("Content-Length") or 0)
-            actual_length = response.raw.tell()
+            actual_length = len(response.raw.getbuffer())
             if actual_length < expected_length:
                 raise ClientIncompleteReadError(
                     "Incomplete read ({} bytes read, {} more expected)".format(
